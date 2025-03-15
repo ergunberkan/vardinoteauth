@@ -4,6 +4,9 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 
+// Sayfayı client-side olarak işaretle
+export const dynamic = 'force-dynamic';
+
 // Ana component
 export default function ConfirmEmailPage() {
   return (
@@ -53,11 +56,18 @@ function ConfirmEmail() {
       return;
     }
 
+    // Supabase'in tanımlı olup olmadığını kontrol et
+    if (!supabase) {
+      setStatus('error');
+      setMessage('Sistem hatası: Supabase bağlantısı kurulamadı. Lütfen daha sonra tekrar deneyin.');
+      return;
+    }
+
     // Supabase API çağrısı ile e-posta doğrulama
     const verifyEmail = async () => {
       try {
-        // Supabase token ile e-posta doğrulama
-        const { error } = await supabase.auth.verifyOtp({
+        // Burada supabase null olmayacak, çünkü yukarıda kontrol ettik
+        const { error } = await supabase!.auth.verifyOtp({
           token_hash: token,
           type: 'signup',
         });

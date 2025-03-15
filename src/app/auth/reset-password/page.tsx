@@ -4,6 +4,9 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 
+// Sayfayı client-side olarak işaretle
+export const dynamic = 'force-dynamic';
+
 // Ana component
 export default function ResetPasswordPage() {
   return (
@@ -88,6 +91,12 @@ function ResetPassword() {
     e.preventDefault();
 
     if (!isValid || !token) {
+      return;
+    }
+
+    // Supabase'in tanımlı olup olmadığını kontrol et
+    if (!supabase) {
+      setStatus('error');
       return;
     }
 
