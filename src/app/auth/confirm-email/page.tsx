@@ -1,12 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import { supabase } from '@/utils/supabase';
 
-export default function ConfirmEmail() {
+// Ana component
+export default function ConfirmEmailPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <ConfirmEmail />
+    </Suspense>
+  );
+}
+
+// Yükleme durumu için fallback component
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-white text-2xl font-bold">VN</span>
+            </div>
+          </div>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">VardiNote</h2>
+          <p className="mt-2 text-sm text-gray-600">E-posta Doğrulama</p>
+        </div>
+
+        <div className="flex justify-center mt-8">
+          <div className="w-10 h-10 border-t-2 border-b-2 border-primary rounded-full animate-spin"></div>
+        </div>
+        <p className="text-center text-gray-600">Sayfa yükleniyor...</p>
+      </div>
+    </div>
+  );
+}
+
+// E-posta doğrulama mantığı için ana component
+function ConfirmEmail() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const type = searchParams.get('type');
