@@ -62,26 +62,48 @@ function ConfirmEmail() {
       return;
     }
 
-    // Supabase API çağrısı ile e-posta doğrulama
-    const verifyEmail = async () => {
+    // Supabase session kontrolü yap ve doğrulama başarılı oldu mu öğren
+    const checkSession = async () => {
       try {
         console.log('Doğrulama kodu:', code);
         
-        // Burada supabase null olmayacak, çünkü yukarıda kontrol ettik
-        const { error } = await supabase!.auth.verifyOtp({
-          token_hash: code,
-          type: 'email',
-        });
+        // Supabase'in otomatik session algılama özelliğini kullanalım
+        const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('E-posta doğrulama hatası:', error);
+          console.error('Oturum kontrolü hatası:', error);
           setStatus('error');
           setMessage('E-posta doğrulama sırasında bir hata oluştu: ' + error.message);
           return;
         }
-        
-        setStatus('success');
-        setMessage('E-posta adresiniz başarıyla doğrulandı!');
+
+        // URL'de code parametresi varsa ve session oluşmuşsa başarılı
+        if (data.session) {
+          setStatus('success');
+          setMessage('E-posta adresiniz başarıyla doğrulandı!');
+        } else {
+          // Manuel doğrulama deneme
+          try {
+            const { error } = await supabase.auth.verifyOtp({
+              token_hash: code,
+              type: 'signup',
+            });
+            
+            if (error) {
+              console.error('OTP doğrulama hatası:', error);
+              setStatus('error');
+              setMessage('E-posta doğrulama sırasında bir hata oluştu: ' + error.message);
+              return;
+            }
+            
+            setStatus('success');
+            setMessage('E-posta adresiniz başarıyla doğrulandı!');
+          } catch (verifyError) {
+            console.error('Beklenmeyen verifyOtp hatası:', verifyError);
+            setStatus('error');
+            setMessage('E-posta doğrulama sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+          }
+        }
       } catch (error) {
         console.error('Beklenmeyen hata:', error);
         setStatus('error');
@@ -89,7 +111,7 @@ function ConfirmEmail() {
       }
     };
 
-    verifyEmail();
+    checkSession();
   }, [code]);
 
   return (
