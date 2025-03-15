@@ -43,14 +43,13 @@ function LoadingState() {
 // E-posta doğrulama mantığı için ana component
 function ConfirmEmail() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-  const type = searchParams.get('type');
+  const code = searchParams.get('code');
   
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('E-posta adresiniz doğrulanıyor...');
 
   useEffect(() => {
-    if (!token || type !== 'signup') {
+    if (!code) {
       setStatus('error');
       setMessage('Geçersiz doğrulama bağlantısı. Lütfen tam URL\'yi kopyalayıp yapıştırdığınızdan emin olun.');
       return;
@@ -66,10 +65,12 @@ function ConfirmEmail() {
     // Supabase API çağrısı ile e-posta doğrulama
     const verifyEmail = async () => {
       try {
+        console.log('Doğrulama kodu:', code);
+        
         // Burada supabase null olmayacak, çünkü yukarıda kontrol ettik
         const { error } = await supabase!.auth.verifyOtp({
-          token_hash: token,
-          type: 'signup',
+          token_hash: code,
+          type: 'email',
         });
         
         if (error) {
@@ -89,7 +90,7 @@ function ConfirmEmail() {
     };
 
     verifyEmail();
-  }, [token, type]);
+  }, [code]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
