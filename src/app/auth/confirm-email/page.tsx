@@ -45,8 +45,41 @@ function ConfirmEmail() {
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'resending'>('verifying');
   const [message, setMessage] = useState('E-posta adresiniz doğrulanıyor...');
+  const [email, setEmail] = useState('');
+
+  // Yeni doğrulama e-postası gönderme fonksiyonu
+  const resendVerificationEmail = async () => {
+    if (!email) {
+      setMessage('Lütfen e-posta adresinizi girin.');
+      return;
+    }
+    
+    setStatus('resending');
+    setMessage('Yeni doğrulama e-postası gönderiliyor...');
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+      
+      if (error) {
+        console.error('Doğrulama e-postası gönderme hatası:', error);
+        setStatus('error');
+        setMessage('Yeni doğrulama e-postası gönderirken bir hata oluştu: ' + error.message);
+        return;
+      }
+      
+      setStatus('success');
+      setMessage('Yeni doğrulama e-postası gönderildi! Lütfen e-posta kutunuzu kontrol edin.');
+    } catch (error) {
+      console.error('Beklenmeyen hata:', error);
+      setStatus('error');
+      setMessage('Yeni doğrulama e-postası gönderirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+    }
+  };
 
   useEffect(() => {
     if (!code) {
@@ -91,6 +124,25 @@ function ConfirmEmail() {
             
             if (error) {
               console.error('OTP doğrulama hatası:', error);
+              
+              // OTP süresi dolmuş mı kontrol et
+              if (error.message.includes('expired') || error.code === 'otp_expired') {
+                // Kullanıcı hesabının zaten doğrulanmış olup olmadığını kontrol et
+                const { data: userData, error: userError } = await supabase.auth.getUser();
+                
+                if (userData && userData.user && userData.user.email_confirmed_at) {
+                  // Kullanıcı zaten doğrulanmış
+                  setStatus('success');
+                  setMessage('Hesabınız zaten doğrulanmış! Uygulamaya giriş yapabilirsiniz.');
+                  return;
+                } else {
+                  // Doğrulama bağlantısının süresi dolmuş
+                  setStatus('error');
+                  setMessage('Doğrulama bağlantısının süresi dolmuş. Lütfen yeni bir doğrulama bağlantısı isteyin.');
+                  return;
+                }
+              }
+              
               setStatus('error');
               setMessage('E-posta doğrulama sırasında bir hata oluştu: ' + error.message);
               return;
@@ -163,9 +215,35 @@ function ConfirmEmail() {
                 </div>
                 <p className="text-lg font-medium text-gray-900">Doğrulama Hatası</p>
                 <p className="text-gray-600">{message}</p>
-                <button className="mt-4 px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200">
+                
+                {/* E-posta adresi giriş alanı */}
+                <div className="w-full mt-4">
+                  <label htmlFor="email" className="sr-only">E-posta Adresi</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="E-posta adresinizi girin"
+                  />
+                </div>
+                
+                <button 
+                  onClick={resendVerificationEmail}
+                  className="mt-4 px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200">
                   Yeni Doğrulama Bağlantısı Gönder
                 </button>
+              </div>
+            )}
+
+            {status === 'resending' && (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-10 h-10 border-t-2 border-b-2 border-primary rounded-full animate-spin"></div>
+                <p className="text-gray-700">{message}</p>
               </div>
             )}
           </div>
