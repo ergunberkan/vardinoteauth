@@ -13,6 +13,7 @@ Bu proje, VardiNote uygulaması için e-posta doğrulama ve şifre sıfırlama s
 - TypeScript
 - TailwindCSS
 - React Hooks
+- Supabase Authentication
 
 ## Kurulum
 
@@ -33,10 +34,27 @@ Projeyi yerel olarak kurmak ve çalıştırmak için:
    npm install
    ```
 
-4. Geliştirme sunucusunu başlatın
+4. `.env.local` dosyasını oluşturun ve Supabase bilgilerinizi ekleyin
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-project-url.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
+
+5. Geliştirme sunucusunu başlatın
    ```
    npm run dev
    ```
+
+## Supabase Kurulumu
+
+1. Supabase hesabınızda yeni bir proje oluşturun
+2. Authentication > URL Configuration bölümünde şu URL'leri ayarlayın:
+   - Site URL: `https://[your-domain]`
+   - Redirect URLs:
+     - `https://[your-domain]/auth/confirm-email` (Email doğrulama)
+     - `https://[your-domain]/auth/reset-password` (Şifre sıfırlama)
+
+3. Supabase proje URL'nizi ve anonim anahtarınızı `.env.local` dosyasına ekleyin
 
 ## Kullanım
 
@@ -48,6 +66,10 @@ Bu sayfalar Supabase'in e-posta doğrulama ve şifre sıfırlama işlemleri ile 
 ## Vercel'e Dağıtma
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fusername%2Fvardinoteauth)
+
+Dağıtım sırasında şu environment değişkenlerini eklemeyi unutmayın:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ## Lisans
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/utils/supabase';
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();
@@ -21,21 +22,9 @@ export default function ResetPassword() {
       return;
     }
 
-    // Burada normalde Supabase API çağrısı yapılır token'ın geçerliliğini kontrol etmek için
-    // Bu örnek için simüle ediyoruz
-    const validateToken = async () => {
-      try {
-        // Simüle edilmiş gecikme
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Token'ın geçerli olduğunu simüle ediyoruz
-        setTokenValid(true);
-      } catch (error) {
-        setTokenValid(false);
-      }
-    };
-
-    validateToken();
+    // Token'ın sadece varlığını kontrol ediyoruz
+    // Gerçek doğrulama şifre sıfırlama sırasında olacak
+    setTokenValid(true);
   }, [token]);
 
   // Şifre geçerliliğini kontrol etme
@@ -72,12 +61,20 @@ export default function ResetPassword() {
     setStatus('loading');
 
     try {
-      // Burada normalde Supabase API çağrısı yapılır
-      // Bu örnek için simüle ediyoruz
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Supabase ile şifre sıfırlama
+      const { error } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (error) {
+        console.error('Şifre güncelleme hatası:', error);
+        setStatus('error');
+        return;
+      }
       
       setStatus('success');
     } catch (error) {
+      console.error('Beklenmeyen hata:', error);
       setStatus('error');
     }
   };

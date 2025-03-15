@@ -4,39 +4,50 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { supabase } from '@/utils/supabase';
 
 export default function ConfirmEmail() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const type = searchParams.get('type');
   
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('E-posta adresiniz doğrulanıyor...');
 
   useEffect(() => {
-    if (!token) {
+    if (!token || type !== 'signup') {
       setStatus('error');
       setMessage('Geçersiz doğrulama bağlantısı. Lütfen tam URL\'yi kopyalayıp yapıştırdığınızdan emin olun.');
       return;
     }
 
-    // Burada normalde Supabase API çağrısı yapılacak
-    // Bu örnek için simüle ediyoruz
+    // Supabase API çağrısı ile e-posta doğrulama
     const verifyEmail = async () => {
       try {
-        // Simüle edilmiş gecikme
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Supabase token ile e-posta doğrulama
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'signup',
+        });
         
-        // Başarılı işlemi simüle ediyoruz
+        if (error) {
+          console.error('E-posta doğrulama hatası:', error);
+          setStatus('error');
+          setMessage('E-posta doğrulama sırasında bir hata oluştu: ' + error.message);
+          return;
+        }
+        
         setStatus('success');
         setMessage('E-posta adresiniz başarıyla doğrulandı!');
       } catch (error) {
+        console.error('Beklenmeyen hata:', error);
         setStatus('error');
         setMessage('E-posta doğrulama sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       }
     };
 
     verifyEmail();
-  }, [token]);
+  }, [token, type]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
