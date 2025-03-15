@@ -128,7 +128,7 @@ function ConfirmEmail() {
               // OTP süresi dolmuş mı kontrol et
               if (error.message.includes('expired') || error.code === 'otp_expired') {
                 // Kullanıcı hesabının zaten doğrulanmış olup olmadığını kontrol et
-                const { data: userData, error: userError } = await supabase.auth.getUser();
+                const { data: userData } = await supabase.auth.getUser();
                 
                 if (userData && userData.user && userData.user.email_confirmed_at) {
                   // Kullanıcı zaten doğrulanmış
