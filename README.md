@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VardiNote Kimlik Doğrulama Sayfaları
 
-## Getting Started
+Bu proje, VardiNote uygulaması için e-posta doğrulama ve şifre sıfırlama sayfalarını içermektedir. Sayfalar modern ve sade bir tasarıma sahiptir ve Supabase kimlik doğrulama işlemleri için tasarlanmıştır.
 
-First, run the development server:
+## Özellikler
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **E-posta Doğrulama Sayfası**: Kullanıcılar kayıt olduktan sonra e-posta adreslerini doğrulamak için bu sayfayı kullanır.
+- **Şifre Sıfırlama Sayfası**: Kullanıcılar şifrelerini unuttukları zaman yeni şifre belirlemek için bu sayfayı kullanır.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Teknolojiler
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js
+- TypeScript
+- TailwindCSS
+- React Hooks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Kurulum
 
-## Learn More
+Projeyi yerel olarak kurmak ve çalıştırmak için:
 
-To learn more about Next.js, take a look at the following resources:
+1. Repoyu klonlayın
+   ```
+   git clone <repo-url>
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Proje dizinine gidin
+   ```
+   cd vardinoteauth
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Bağımlılıkları yükleyin
+   ```
+   npm install
+   ```
 
-## Deploy on Vercel
+4. Geliştirme sunucusunu başlatın
+   ```
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Kullanım
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bu sayfalar Supabase'in e-posta doğrulama ve şifre sıfırlama işlemleri ile çalışmak üzere tasarlanmıştır. Sayfaları Vercel'e dağıtarak, aşağıdaki URL'leri Supabase'in yönlendirme URL'leri olarak ayarlayabilirsiniz:
+
+- E-posta Doğrulama: `https://[your-domain]/auth/confirm-email`
+- Şifre Sıfırlama: `https://[your-domain]/auth/reset-password`
+
+## Vercel'e Dağıtma
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fusername%2Fvardinoteauth)
+
+## Lisans
+
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
